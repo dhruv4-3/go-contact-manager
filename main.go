@@ -1,15 +1,25 @@
 package main
 
+// TODO Package differently rather than writing in main
+// TODO Break down functions into smaller blocks
+// TODO Proper validation and use Println to explore the error than forcing a crash
+
 import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 )
 
 type Contact struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
+}
+
+func isValidEmail(email string) bool {
+	re := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	return re.MatchString(email)
 }
 
 func addContact(firstName string, lastName string, email string) error {
@@ -23,7 +33,7 @@ func addContact(firstName string, lastName string, email string) error {
 	if err != nil {
 		panic("Unable to marshall contact")
 	}
-	file, err := os.OpenFile("contact-db.txt", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
+	file, err := os.OpenFile("contact-db.json", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		panic("Error writing file")
 	}
@@ -37,12 +47,14 @@ func addContact(firstName string, lastName string, email string) error {
 }
 
 func viewContacts() {
-	fr, err := os.ReadFile("contact-db.txt")
+	fr, err := os.Open("contact-db.json")
 	if err != nil {
 		panic("Error reading file")
 	}
 	var contacts []Contact
-	if err := json.Unmarshal(fr, &contacts); err != nil {
+	defer fr.Close()
+	decoder := json.NewDecoder(fr)
+	if err := decoder.Decode(&contacts); err != nil {
 		panic("Could not unmarshall data from file")
 	}
 	for _, contact := range contacts {
@@ -52,7 +64,7 @@ func viewContacts() {
 
 func searchContact(firstName string) error {
 	var contacts []Contact
-	fr, err := os.ReadFile("contact-db.txt")
+	fr, err := os.ReadFile("contact-db.json")
 	if err != nil {
 		panic("Unable to read file")
 	}
@@ -71,7 +83,7 @@ func searchContact(firstName string) error {
 func deleteContact(firstName string) error {
 	var contacts []Contact
 	var newContacts []Contact
-	fr, err := os.ReadFile("contact-db.txt")
+	fr, err := os.ReadFile("contact-db.json")
 	if err != nil {
 		panic("Could not open file")
 	}
@@ -92,7 +104,7 @@ func deleteContact(firstName string) error {
 		panic("Could not marshall new contacts")
 	}
 
-	if err := os.WriteFile("contact-db.txt", data, 0644); err != nil {
+	if err := os.WriteFile("contact-db.json", data, 0644); err != nil {
 		panic("Could not write file after delete")
 	}
 	return nil
@@ -123,6 +135,9 @@ loop:
 			fmt.Scanln(&email)
 			if len(firstName) < 1 || len(lastName) < 1 || len(email) < 1 {
 				panic("Please enter the right values")
+			}
+			if !isValidEmail(email) {
+				panic("Invalid Email")
 			}
 			if err := addContact(firstName, lastName, email); err != nil {
 				panic("Could not add contact")
