@@ -1,9 +1,11 @@
 package contacts
 
+//TODO Have to learn to write json file
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 )
@@ -23,6 +25,8 @@ func AddContact() error {
 	fmt.Println("Enter the email of the contact")
 	fmt.Scanln(&email)
 
+	var contacts []ContactInfo
+
 	var contact = ContactInfo{
 		FirstName: firstName,
 		LastName:  lastName,
@@ -33,7 +37,8 @@ func AddContact() error {
 		fmt.Println("Error validating data")
 		return err
 	} else {
-		saveContact(contact)
+		contacts = append(contacts, contact)
+		saveContact(contacts)
 		return nil
 	}
 }
@@ -62,16 +67,15 @@ func validateEmail(email string) bool {
 	return re.MatchString(email)
 }
 
-func saveContact(contact ContactInfo) {
-	contactJson, _ := json.Marshal(contact)
-	file, err := os.OpenFile("contacts-db.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+func saveContact(contacts []ContactInfo) {
+	file, err := os.OpenFile("contacts-db.json", os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		fmt.Println("Error opening file: ", err)
 	}
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	if err := encoder.Encode(contactJson); err != nil {
+	if err := encoder.Encode(contacts); err != nil {
 		fmt.Println("Cannot write json to file")
 	}
 }
@@ -82,16 +86,24 @@ func ViewContact() error {
 	fmt.Println("Enter the first name of the contact you want to search")
 	fmt.Scanln(&firstName)
 	loadData(&contacts)
-	return nil
+	for _, contact := range contacts {
+		if contact.FirstName == firstName {
+			fmt.Println("Contact found")
+			fmt.Printf("First Name: %s\t Last Name: %s\t Email: %s\n", contact.FirstName, contact.LastName, contact.Email)
+			return nil
+		}
+	}
+	return errors.New("could not find the contact")
 }
 
 func loadData(contacts *[]ContactInfo) {
-	file, err := os.OpenFile("contacts-db.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	file, err := os.OpenFile("contacts-db.json", os.O_RDONLY, 0644)
 	if err != nil {
 		fmt.Println("Error opening file: ", err)
 	}
+	defer file.Close()
 	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(contacts); err != nil {
+	if err := decoder.Decode(contacts); err != nil && err != io.EOF {
 		fmt.Println("Error unmarshalling data from file")
 	}
 }

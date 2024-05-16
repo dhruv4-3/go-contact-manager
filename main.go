@@ -28,6 +28,7 @@ loop:
 			if err := contacts.ViewContact(); err != nil {
 				fmt.Println("Error viewing contact")
 			}
+			// TODO Implement all missing functions
 		// case 3:
 		// 	if err := contacts.SearchContact(); err != nil {
 		// 		fmt.Println("Error searching contact")
