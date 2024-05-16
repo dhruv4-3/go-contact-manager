@@ -16,6 +16,8 @@ type ContactInfo struct {
 	Email     string `json:"Email"`
 }
 
+var contacts []ContactInfo
+
 func AddContact() error {
 	var firstName, lastName, email string
 	fmt.Println("Enter the first name of the contact")
@@ -24,8 +26,6 @@ func AddContact() error {
 	fmt.Scanln(&lastName)
 	fmt.Println("Enter the email of the contact")
 	fmt.Scanln(&email)
-
-	var contacts []ContactInfo
 
 	var contact = ContactInfo{
 		FirstName: firstName,
@@ -80,7 +80,7 @@ func saveContact(contacts []ContactInfo) {
 	}
 }
 
-func ViewContact() error {
+func SearchContact() error {
 	var firstName string
 	var contacts []ContactInfo
 	fmt.Println("Enter the first name of the contact you want to search")
@@ -94,6 +94,25 @@ func ViewContact() error {
 		}
 	}
 	return errors.New("could not find the contact")
+}
+
+func ViewContact() {
+	for _, contact := range contacts {
+		fmt.Printf("First Name: %s\t Last Name: %s\t Email: %s\n", contact.FirstName, contact.LastName, contact.Email)
+	}
+}
+
+func DeleteContact() {
+	loadData(&contacts)
+	var firstName string
+	fmt.Println("Enter the first name of the contact you want to delete")
+	fmt.Scanln(&firstName)
+	for index, contact := range contacts {
+		if contact.FirstName == firstName {
+
+		}
+	}
+
 }
 
 func loadData(contacts *[]ContactInfo) {

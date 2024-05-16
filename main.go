@@ -5,8 +5,6 @@ import (
 	contacts "go-contact-manager/modules/contacts"
 )
 
-var contactList []contacts.ContactInfo
-
 func main() {
 	fmt.Println("Welcome to the contacts manager")
 loop:
@@ -25,14 +23,12 @@ loop:
 				fmt.Println("Error adding contact")
 			}
 		case 2:
-			if err := contacts.ViewContact(); err != nil {
-				fmt.Println("Error viewing contact")
-			}
+			contacts.ViewContact()
 			// TODO Implement all missing functions
-		// case 3:
-		// 	if err := contacts.SearchContact(); err != nil {
-		// 		fmt.Println("Error searching contact")
-		// 	}
+		case 3:
+			if err := contacts.SearchContact(); err != nil {
+				fmt.Println("Error searching contact")
+			}
 		// case 4:
 		// 	if err := contacts.DeleteContact(); err != nil {
 		// 		fmt.Println("Error deleting contact")
