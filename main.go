@@ -1,26 +1,50 @@
 package main
 
-// TODO Break down functions into smaller blocks
-// TODO Proper validation and use Println to explore the error than forcing a crash
-
 import (
 	"fmt"
-	"pkgs/contact-manager"
+	contacts "go-contact-manager/modules/contacts"
 )
 
-var contacts []contact.Contact
+var contactList []contacts.ContactInfo
 
 func main() {
-	fmt.Println("Welcome to the contact manager")
-	// loop:
+	fmt.Println("Welcome to the contacts manager")
+loop:
 	for {
 		var choice int
-		fmt.Println("Choose the operation")
+		fmt.Println("Enter your choice")
 		fmt.Println("1. Add contact")
 		fmt.Println("2. View contacts")
-		fmt.Println("3. Update contact")
+		fmt.Println("3. Search contact")
 		fmt.Println("4. Delete contact")
-		fmt.Println("5. Search contact")
-
+		fmt.Println("5. Update contact")
+		fmt.Scanln(&choice)
+		switch choice {
+		case 1:
+			if err := contacts.AddContact(); err != nil {
+				fmt.Println("Error adding contact")
+			}
+		case 2:
+			if err := contacts.ViewContact(); err != nil {
+				fmt.Println("Error viewing contact")
+			}
+		// case 3:
+		// 	if err := contacts.SearchContact(); err != nil {
+		// 		fmt.Println("Error searching contact")
+		// 	}
+		// case 4:
+		// 	if err := contacts.DeleteContact(); err != nil {
+		// 		fmt.Println("Error deleting contact")
+		// 	}
+		// case 5:
+		// 	if err := contacts.UpdateContact(); err != nil {
+		// 		fmt.Println("Error updating contact")
+		// 	}
+		case 0:
+			fmt.Println("Exiting application")
+			break loop
+		default:
+			fmt.Println("Wrong Entry try again")
+		}
 	}
 }
