@@ -22,6 +22,7 @@ loop:
 		fmt.Println("3. Search contact")
 		fmt.Println("4. Delete contact")
 		fmt.Println("5. Update contact")
+		fmt.Println("0. Exit application")
 		fmt.Scanln(&choice)
 		switch choice {
 		case 1:
@@ -46,7 +47,6 @@ loop:
 			}
 		case 2:
 			contacts.ViewContacts(contactList)
-		// 	// TODO Implement all missing functions
 		case 3:
 			var firstName string
 			fmt.Println("Enter the firstname of the contact you want to search")
@@ -63,10 +63,13 @@ loop:
 			if err := contacts.DeleteContact(firstName, contactList); err != nil {
 				fmt.Println(err)
 			}
-		// case 5:
-		// 	if err := contacts.UpdateContact(); err != nil {
-		// 		fmt.Println("Error updating contact")
-		// 	}
+		case 5:
+			var firstName string
+			fmt.Println("Enter the firstname of the contact you want to update")
+			fmt.Scanln(&firstName)
+			if err := contacts.UpdateContact(firstName, contactList); err != nil {
+				fmt.Println(err)
+			}
 		case 0:
 			fmt.Println("Exiting application")
 			break loop

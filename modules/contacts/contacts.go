@@ -68,7 +68,42 @@ func SearchContacts(firstName string, contacts []ContactInfo) (int, error) {
 
 // delete
 func DeleteContact(firstName string, contacts []ContactInfo) error {
-
+	index, err := SearchContacts(firstName, contacts)
+	if err != nil {
+		return err
+	}
+	contacts = append(contacts[:index], contacts[index+1:]...)
+	if err := SaveContacts(contacts); err != nil {
+		return err
+	}
+	return nil
 }
 
-//update
+// update
+func UpdateContact(firstName string, contacts []ContactInfo) error {
+	err := DeleteContact(firstName, contacts)
+	if err != nil {
+		return err
+	}
+	var updatedFirstName, updatedLastName, updatedEmail string
+	fmt.Println("Enter the first name of the contact you want to update")
+	fmt.Scanln(&updatedFirstName)
+	fmt.Println("Enter the last name of the contact you want to update")
+	fmt.Scanln(&updatedLastName)
+	fmt.Println("Enter the email of the contact you want to update")
+	fmt.Scanln(&updatedEmail)
+
+	var contact = ContactInfo{
+		FirstName: updatedFirstName,
+		LastName:  updatedLastName,
+		Email:     updatedEmail,
+	}
+
+	if err := LoadData(&contacts); err != nil {
+		return err
+	}
+	if err := AddContact(contact, contacts); err != nil {
+		return err
+	}
+	return nil
+}
