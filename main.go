@@ -4,34 +4,38 @@ import (
 	"fmt"
 	"go-contact-manager/modules/common"
 	contacts "go-contact-manager/modules/contacts"
+	"log"
+	"os"
 )
 
 var contactList []contacts.ContactInfo
 
 func main() {
-	fmt.Println("Welcome to the contacts manager")
+	logger := log.New(os.Stdout, "controller", log.LstdFlags)
+
+	logger.Println("Welcome to the contacts manager")
 loop:
 	for {
 		if err := contacts.LoadData(&contactList); err != nil {
-			fmt.Println("Error loading data")
+			logger.Fatalln("Error loading data")
 		}
 		var choice int
-		fmt.Println("Enter your choice")
-		fmt.Println("1. Add contact")
-		fmt.Println("2. View contacts")
-		fmt.Println("3. Search contact")
-		fmt.Println("4. Delete contact")
-		fmt.Println("5. Update contact")
-		fmt.Println("0. Exit application")
+		logger.Println("Enter your choice")
+		logger.Println("1. Add contact")
+		logger.Println("2. View contacts")
+		logger.Println("3. Search contact")
+		logger.Println("4. Delete contact")
+		logger.Println("5. Update contact")
+		logger.Println("0. Exit application")
 		fmt.Scanln(&choice)
 		switch choice {
 		case 1:
 			var firstName, lastName, email string
-			fmt.Println("Enter the first name of the contact you want to add")
+			logger.Println("Enter the first name of the contact you want to add")
 			fmt.Scanln(&firstName)
-			fmt.Println("Enter the last name of the contact you want to add")
+			logger.Println("Enter the last name of the contact you want to add")
 			fmt.Scanln(&lastName)
-			fmt.Println("Enter the email of the contact you want to add")
+			logger.Println("Enter the email of the contact you want to add")
 			fmt.Scanln(&email)
 			contact := contacts.ContactInfo{
 				FirstName: firstName,
@@ -39,42 +43,42 @@ loop:
 				Email:     email,
 			}
 			if err := common.ValidateData(contact); err != nil {
-				fmt.Println("Error validating data. ", err)
+				logger.Fatalln("Error validating data. ", err)
 				break
 			}
 			if err := contacts.AddContact(contact, contactList); err != nil {
-				fmt.Println("Error adding contact ", err)
+				logger.Fatalln("Error adding contact ", err)
 			}
 		case 2:
 			contacts.ViewContacts(contactList)
 		case 3:
 			var firstName string
-			fmt.Println("Enter the firstname of the contact you want to search")
+			logger.Println("Enter the firstname of the contact you want to search")
 			fmt.Scanln(&firstName)
 			if index, err := contacts.SearchContacts(firstName, contactList); err == nil {
-				fmt.Printf("Entry:\nFirstName: %s, LastName: %s, Email: %s\n", contactList[index].FirstName, contactList[index].LastName, contactList[index].Email)
+				logger.Printf("Entry:\nFirstName: %s, LastName: %s, Email: %s\n", contactList[index].FirstName, contactList[index].LastName, contactList[index].Email)
 			} else {
-				fmt.Println(err)
+				logger.Fatalln(err)
 			}
 		case 4:
 			var firstName string
-			fmt.Println("Enter the firstname of the contact you want to delete")
+			logger.Println("Enter the firstname of the contact you want to delete")
 			fmt.Scanln(&firstName)
 			if err := contacts.DeleteContact(firstName, contactList); err != nil {
-				fmt.Println(err)
+				logger.Fatalln(err)
 			}
 		case 5:
 			var firstName string
-			fmt.Println("Enter the firstname of the contact you want to update")
+			logger.Println("Enter the firstname of the contact you want to update")
 			fmt.Scanln(&firstName)
 			if err := contacts.UpdateContact(firstName, contactList); err != nil {
-				fmt.Println(err)
+				logger.Fatalln(err)
 			}
 		case 0:
-			fmt.Println("Exiting application")
+			logger.Println("Exiting application")
 			break loop
 		default:
-			fmt.Println("Wrong Entry try again")
+			logger.Println("Wrong Entry try again")
 		}
 	}
 }

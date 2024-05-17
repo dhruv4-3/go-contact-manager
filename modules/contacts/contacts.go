@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -13,10 +14,12 @@ type ContactInfo struct {
 	Email     string `json:"Email"`
 }
 
+var logger = log.New(os.Stdout, "controller", log.LstdFlags)
+
 func LoadData(contacts *[]ContactInfo) error {
 	file, err := os.Open("contacts-db.json")
 	if err != nil {
-		fmt.Println("Error opening file")
+		logger.Println("Error opening file")
 	}
 	defer file.Close()
 	decoder := json.NewDecoder(file)
@@ -51,7 +54,7 @@ func AddContact(contact ContactInfo, contactList []ContactInfo) error {
 // view
 func ViewContacts(contactList []ContactInfo) {
 	for _, contact := range contactList {
-		fmt.Printf("FirstName: %s, LastName: %s, Email: %s\n", contact.FirstName, contact.LastName, contact.Email)
+		logger.Printf("FirstName: %s, LastName: %s, Email: %s\n", contact.FirstName, contact.LastName, contact.Email)
 	}
 }
 
@@ -59,7 +62,7 @@ func ViewContacts(contactList []ContactInfo) {
 func SearchContacts(firstName string, contacts []ContactInfo) (int, error) {
 	for index, contact := range contacts {
 		if contact.FirstName == firstName {
-			fmt.Println("Contact found at position", index)
+			logger.Println("Contact found at position", index)
 			return index, nil
 		}
 	}
@@ -86,11 +89,11 @@ func UpdateContact(firstName string, contacts []ContactInfo) error {
 		return err
 	}
 	var updatedFirstName, updatedLastName, updatedEmail string
-	fmt.Println("Enter the first name of the contact you want to update")
+	logger.Println("Enter the first name of the contact you want to update")
 	fmt.Scanln(&updatedFirstName)
-	fmt.Println("Enter the last name of the contact you want to update")
+	logger.Println("Enter the last name of the contact you want to update")
 	fmt.Scanln(&updatedLastName)
-	fmt.Println("Enter the email of the contact you want to update")
+	logger.Println("Enter the email of the contact you want to update")
 	fmt.Scanln(&updatedEmail)
 
 	var contact = ContactInfo{
