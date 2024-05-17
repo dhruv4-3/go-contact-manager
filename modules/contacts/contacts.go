@@ -8,6 +8,8 @@ import (
 	"os"
 )
 
+var saveContacts = SaveContacts
+
 type ContactInfo struct {
 	FirstName string `json:"FirstName"`
 	LastName  string `json:"LastName"`
@@ -45,7 +47,7 @@ func SaveContacts(contacts []ContactInfo) error {
 // add
 func AddContact(contact ContactInfo, contactList []ContactInfo) error {
 	contactList = append(contactList, contact)
-	if err := SaveContacts(contactList); err != nil {
+	if err := saveContacts(contactList); err != nil {
 		return err
 	}
 	return nil
