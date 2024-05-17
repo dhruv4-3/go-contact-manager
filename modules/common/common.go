@@ -4,8 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"go-contact-manager/modules/contacts"
+	"log"
+	"os"
 	"regexp"
 )
+
+var logger = log.New(os.Stdout, "controller", log.LstdFlags)
 
 func ValidateData(contact contacts.ContactInfo) error {
 	if ValidateName(contact.FirstName, contact.LastName) {

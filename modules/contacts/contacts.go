@@ -18,12 +18,31 @@ type ContactInfo struct {
 
 var logger = log.New(os.Stdout, "controller", log.LstdFlags)
 
+func CheckFileLock() bool {
+	_, err := os.Stat("contacts-db.json_lock")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+		logger.Println("Error checking file lock")
+	}
+	return true
+}
+
 func LoadData(contacts *[]ContactInfo) error {
+	if CheckFileLock() {
+		return errors.New("file is locked and used by another process. try again later...")
+	}
 	file, err := os.Open("contacts-db.json")
 	if err != nil {
 		logger.Println("Error opening file")
 	}
-	defer file.Close()
+	os.Create("contacts-db.json_lock")
+	// defer file.Close()
+	defer func() {
+		file.Close()
+		os.Remove("contacts-db.json_lock")
+	}()
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(contacts); err != nil {
 		return err
@@ -32,11 +51,19 @@ func LoadData(contacts *[]ContactInfo) error {
 }
 
 func SaveContacts(contacts []ContactInfo) error {
+	if CheckFileLock() {
+		return errors.New("file is locked and used by another process. try again later...")
+	}
 	file, err := os.OpenFile("contacts-db.json", os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return errors.New("error opening file")
 	}
-	defer file.Close()
+	os.Create("contacts-db.json_lock")
+	// defer file.Close()
+	defer func() {
+		file.Close()
+		os.Remove("contacts-db.json_lock")
+	}()
 	encoder := json.NewEncoder(file)
 	if err := encoder.Encode(contacts); err != nil {
 		return errors.New("error writing file contents")
