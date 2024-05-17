@@ -64,3 +64,36 @@ func TestViewContacts(t *testing.T) {
 		})
 	}
 }
+
+func TestSearchContacts(t *testing.T) {
+	tests := []struct {
+		name      string
+		firstName string
+		contacts  []ContactInfo
+		expected  error
+	}{
+		{
+			name:      "John_Success",
+			firstName: "John",
+			contacts:  []ContactInfo{{FirstName: "John", LastName: "Jones", Email: "john@jones.com"}},
+			expected:  nil,
+		},
+		{
+			name:      "John_Error",
+			firstName: "Sandra",
+			contacts:  []ContactInfo{{FirstName: "John", LastName: "Jones", Email: "john@jones.com"}},
+			expected:  errors.New("could not find the contact"),
+		},
+	}
+	t.Log("Running tests for Searching John")
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			_, err := SearchContacts(test.firstName, test.contacts)
+			if err != nil {
+				t.Logf("Expected %v, Got %v", test.expected, err)
+			} else {
+				t.Logf("Expected %v, Got %v", test.expected, err)
+			}
+		})
+	}
+}
